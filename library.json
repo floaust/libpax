@@ -2,7 +2,7 @@
     "name": "libpax",
     "version":"1.0.1",
     "keywords": "libpax",
-    "description": "Library for PAX counting using BLE and WiFi",
+    "description": "Library for PAX counting using BLE",
     "repository":
     {
       "type": "git",

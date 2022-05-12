@@ -18,10 +18,11 @@ limitations under the License.
 */
 #include "globals.h"
 
-#include "libpax.h"
+#include <Arduino.h>
 #include <libpax_api.h>
-#include "esp_log.h"
 #include <string.h>
+#include "esp_log.h"
+#include "libpax.h"
 
 typedef uint32_t bitmap_t;
 enum { BITS_PER_WORD = sizeof(bitmap_t) * CHAR_BIT };
@@ -33,7 +34,6 @@ enum { BITS_PER_WORD = sizeof(bitmap_t) * CHAR_BIT };
 DRAM_ATTR bitmap_t seen_ids_map[LIBPAX_MAP_SIZE];
 int seen_ids_count = 0;
 
-uint16_t volatile macs_wifi = 0;
 uint16_t volatile macs_ble = 0;
 
 uint8_t volatile channel = 0;  // channel rotation counter
@@ -65,32 +65,28 @@ void reset_bucket() {
   seen_ids_count = 0;
 }
 
-int libpax_wifi_counter_count() { return macs_wifi; }
-
 int libpax_ble_counter_count() { return macs_ble; }
 
-IRAM_ATTR int mac_add(uint8_t *paddr, snifftype_t sniff_type) {
+IRAM_ATTR int mac_add(uint8_t *paddr) {
   uint16_t *id;
   // mac addresses are 6 bytes long, we only use the last two bytes
   id = (uint16_t *)(paddr + 4);
-    
-  //ESP_LOGD(TAG, "MAC=%02x:%02x:%02x:%02x:%02x:%02x -> ID=%04x", paddr[0],
-  //         paddr[1], paddr[2], paddr[3], paddr[4], paddr[5], *id);
-    
-  // if it is NOT a locally administered ("random") mac, we don't count it
-  if (!(paddr[0] & 0b10)) return false;
-  
+
   int added = add_to_bucket(*id);
 
   // Count only if MAC was not yet seen
   if (added) {
-    if(sniff_type == MAC_SNIFF_BLE) {
-      macs_ble++;
-    } else if(sniff_type == MAC_SNIFF_WIFI)  {
-      macs_wifi++;
-    }
-  };  // added
+    macs_ble++;
+    // if it is NOT a locally administered ("random") mac, we don't count it
+    if (!(paddr[0] & 0b10)) {
+      ESP_LOGI(TAG, "MAC=%02x:%02x:%02x:%02x:%02x:%02x -> ID=%04x; random",
+               paddr[0], paddr[1], paddr[2], paddr[3], paddr[4], paddr[5], *id);
+    } else {
+      ESP_LOGI(TAG, "MAC=%02x:%02x:%02x:%02x:%02x:%02x -> ID=%04x", paddr[0],
+               paddr[1], paddr[2], paddr[3], paddr[4], paddr[5], *id);
+    };  // added
 
-  return added;  // function returns bool if a new and unique Wifi or BLE mac
-                 // was counted (true) or not (false)
+    return added;  // function returns bool if a new and unique BLE mac
+                   // was counted (true) or not (false)
+  }
 }

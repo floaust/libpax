@@ -182,7 +182,7 @@ void hci_evt_process(void *pvParameters) {
             if (ble_rssi_threshold && (rssi < ble_rssi_threshold))
               continue;  // do not count weak signal mac
             else {
-              mac_add(addr + 6 * i, MAC_SNIFF_BLE);
+              mac_add(addr + 6 * i);
             }
           }
 
@@ -282,7 +282,6 @@ void stop_BLE_scan(void) {
     ESP_ERROR_CHECK(esp_bt_controller_disable());
     ESP_ERROR_CHECK(esp_bt_controller_deinit());
 #endif
-    ESP_ERROR_CHECK(esp_coex_preference_set(ESP_COEX_PREFER_WIFI));
     ESP_LOGI(TAG, "Bluetooth scanner stopped");
     initialized_ble = 0;
   }
