@@ -35,7 +35,7 @@ int libpax_counter_init(void (*callback)(void), struct count_payload_t* current_
 /**
  *   Starts hardware wifi layer and counting of pax
  */
-int libpax_counter_start();
+int libpax_counter_start(libpax_config_t configuration);
 
 /**
  *   Stops sniffing process after which no new macs will be received and the wifi allocation is shutdown
@@ -53,35 +53,6 @@ int libpax_counter_count(struct count_payload_t* count);
  */
 #define LIBPAX_CONFIG_SIZE 64
 
-/*
- * Writes given configuration into memory at store_addr
- *   @param [out] store_addr addr to write configuration payload into (should be allocated to sizeof(libpax_config_storage_t))
- *   @param configuration configuration used for writing into memory at store_addr
-*/
-void libpax_serialize_config(char* store_addr, struct libpax_config_t* configuration);
-
-/*
- Writes given configuration into memory at store_addr
- *   @param source addr from which configuration payload is read (only minor version changes are allowed)
- *   @param [out] configuration configuration which was stored in memory at restore_addr
-*/
-int libpax_deserialize_config(char* source, struct libpax_config_t* configuration);
-
-/*
- Sets scanning configuration
- *   @param configuration configuration used for scanning behaviour
-*/
-int libpax_update_config(struct libpax_config_t* configuration);
-
-/*
- Returns current set configuration as out parameter
- *   @param [out] configuration configuration used for scanning behaviour
-*/
-void libpax_get_current_config(struct libpax_config_t* configuration);
-
-/*
- Writes default configuration into out parameter
- *   @param [out] configuration configuration used for scanning behaviour
-*/
-void libpax_default_config(struct libpax_config_t* configuration);
+//disables wifi chip
+void disable_wifi();
 #endif

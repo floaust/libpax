@@ -1,5 +1,6 @@
 #include <libpax_api.h>
 #include <stdio.h>
+#include <Arduino.h>
 
 struct count_payload_t count_from_libpax;
 
@@ -9,15 +10,21 @@ void process_count(void) {
 
 void init() {
   struct libpax_config_t configuration; 
-  libpax_default_config(&configuration);
+  //configuration.ble_rssi_threshold = 0;
+  configuration.blescaninterval = 80;
+  configuration.blescanwindow = 80;
   configuration.blecounter = 1;
   configuration.blescantime = 0; // infinite
   configuration.ble_rssi_threshold = -80;
-  libpax_update_config(&configuration);
+
+  disable_wifi();
+
+  //change clock speed
+  setCpuFrequencyMhz(10);
 
   // internal processing initialization
   libpax_counter_init(process_count, &count_from_libpax, 10, 1); 
-  libpax_counter_start();
+  libpax_counter_start(configuration);
 }
 
 #ifdef LIBPAX_ARDUINO

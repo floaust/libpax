@@ -16,18 +16,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include <Arduino.h>
 #include <libpax_api.h>
 #include "blescan.h"
 #include "libpax.h"
-#include <Arduino.h>
 
+#include <esp_coexist.h>
+#include <esp_event.h>
 #include <esp_log.h>
 #include <esp_spi_flash.h>  // needed for reading ESP32 chip attributes
+#include <esp_wifi.h>
 #include <string.h>
 #include "freertos/task.h"    // needed for tasks
 #include "freertos/timers.h"  // TimerHandle_t
 
-struct libpax_config_t current_config;
 int config_set = 0;
 
 void (*report_callback)(void);
@@ -50,72 +52,6 @@ void report(TimerHandle_t xTimer) {
   if (counter_mode != 1) {
     libpax_counter_reset();
   }
-}
-
-void libpax_serialize_config(char* store_addr,
-                             struct libpax_config_t* configuration) {
-  struct libpax_config_storage_t storage_buffer;
-  storage_buffer.major_version = CONFIG_MAJOR_VERSION;
-  storage_buffer.minor_version = CONFIG_MINOR_VERSION;
-  memcpy(&(storage_buffer.config), configuration,
-         sizeof(struct libpax_config_t));
-  memset(storage_buffer.checksum, 0, sizeof(storage_buffer.checksum));
-  memcpy(store_addr, &storage_buffer, sizeof(struct libpax_config_storage_t));
-}
-
-int libpax_deserialize_config(char* source,
-                              struct libpax_config_t* configuration) {
-  struct libpax_config_storage_t storage_buffer;
-  memcpy(&storage_buffer, source, sizeof(struct libpax_config_storage_t));
-  if (storage_buffer.major_version != CONFIG_MAJOR_VERSION) {
-    ESP_LOGE("configuration",
-             "Restoring incompatible config with different MAJOR version: "
-             "%d.%d instead of %d.%d",
-             storage_buffer.major_version, storage_buffer.minor_version,
-             CONFIG_MAJOR_VERSION, CONFIG_MINOR_VERSION);
-    return -1;
-  }
-  if (storage_buffer.minor_version != CONFIG_MINOR_VERSION) {
-    ESP_LOGW(
-        "configuration",
-        "Restoring config with different MINOR version: %d.%d instead of %d.%d",
-        storage_buffer.major_version, storage_buffer.minor_version,
-        CONFIG_MAJOR_VERSION, CONFIG_MINOR_VERSION);
-  }
-  memcpy(configuration, &(storage_buffer.config),
-         sizeof(struct libpax_config_t));
-  return 0;
-}
-
-void libpax_default_config(struct libpax_config_t* configuration) {
-  memset(configuration, 0, sizeof(struct libpax_config_t));
-  configuration->blecounter = 0;
-  configuration->ble_rssi_threshold = 0;
-  configuration->blescaninterval = 80;
-  configuration->blescantime = 0;
-  configuration->blescanwindow = 80;
-}
-
-void libpax_get_current_config(struct libpax_config_t* configuration) {
-  memcpy(configuration, &current_config, sizeof(struct libpax_config_t));
-}
-
-int libpax_update_config(struct libpax_config_t* configuration) {
-  int result = 0;
-
-#ifndef LIBPAX_BLE
-  if (configuration->blecounter) {
-    ESP_LOGE("configuration",
-             "Configuration requests BLE but was disabled at compile time.");
-    result &= LIBPAX_ERROR_BLE_NOT_AVAILABLE;
-  }
-#endif
-
-  if (result == 0) {
-    memcpy(&current_config, configuration, sizeof(struct libpax_config_t));
-    config_set = 1;
-  }
-  return result;
 }
 
 TimerHandle_t PaxReportTimer = NULL;
@@ -150,17 +86,15 @@ int libpax_counter_init(void (*init_callback)(void),
   return 0;
 }
 
-int libpax_counter_start() {
+int libpax_counter_start(libpax_config_t configuration) {
   if (config_set == 0) {
     ESP_LOGE("configuration", "Configuration was not yet set.");
     return -1;
   }
-  ESP_ERROR_CHECK(esp_wifi_set_promiscuous(false));
-  esp_wifi_set_ps(WIFI_PS_NONE);
-  if (current_config.blecounter) {
-    set_BLE_rssi_filter(current_config.ble_rssi_threshold);
-    start_BLE_scan(current_config.blescantime, current_config.blescanwindow,
-                   current_config.blescaninterval);
+  if (configuration.blecounter) {
+    set_BLE_rssi_filter(configuration.ble_rssi_threshold);
+    start_BLE_scan(configuration.blescantime, configuration.blescanwindow,
+                   configuration.blescaninterval);
   }
   return 0;
 }
@@ -175,4 +109,12 @@ int libpax_counter_stop() {
 int libpax_counter_count(struct count_payload_t* count) {
   fill_counter(count);
   return 0;
+}
+
+void disable_wifi() {
+  ESP_ERROR_CHECK(
+      esp_wifi_set_promiscuous(false));  // now switch off monitor mode
+  ESP_ERROR_CHECK(esp_wifi_stop());
+  ESP_ERROR_CHECK(esp_wifi_deinit());
+  esp_wifi_set_mode(WIFI_MODE_NULL);
 }
