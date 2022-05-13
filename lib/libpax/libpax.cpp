@@ -85,8 +85,8 @@ IRAM_ATTR int mac_add(uint8_t *paddr) {
       ESP_LOGI(TAG, "MAC=%02x:%02x:%02x:%02x:%02x:%02x -> ID=%04x", paddr[0],
                paddr[1], paddr[2], paddr[3], paddr[4], paddr[5], *id);
     };  // added
-
-    return added;  // function returns bool if a new and unique BLE mac
-                   // was counted (true) or not (false)
   }
+
+  return added;  // function returns bool if a new and unique BLE mac
+                 // was counted (true) or not (false)
 }

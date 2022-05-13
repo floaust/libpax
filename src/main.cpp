@@ -20,9 +20,6 @@ void init() {
 
   disable_wifi();
 
-  //change clock speed
-  setCpuFrequencyMhz(10);
-
   // internal processing initialization
   libpax_counter_init(process_count, &count_from_libpax, 10, 1); 
   libpax_counter_start(configuration);
