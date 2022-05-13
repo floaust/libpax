@@ -9,6 +9,7 @@ void process_count(void) {
 }
 
 void init() {
+  ESP_LOGI(TAG, "Initializing libpax");
   struct libpax_config_t configuration; 
   //configuration.ble_rssi_threshold = 0;
   configuration.blescaninterval = 80;

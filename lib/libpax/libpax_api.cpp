@@ -30,8 +30,6 @@ limitations under the License.
 #include "freertos/task.h"    // needed for tasks
 #include "freertos/timers.h"  // TimerHandle_t
 
-int config_set = 0;
-
 void (*report_callback)(void);
 struct count_payload_t* pCurrent_count;
 int counter_mode;
@@ -42,6 +40,7 @@ void fill_counter(struct count_payload_t* pCount) {
 
 void libpax_counter_reset() {
   macs_ble = 0;
+  ESP_LOGI(TAG, "reset");
   reset_bucket();
 }
 
@@ -87,10 +86,6 @@ int libpax_counter_init(void (*init_callback)(void),
 }
 
 int libpax_counter_start(libpax_config_t configuration) {
-  if (config_set == 0) {
-    ESP_LOGE("configuration", "Configuration was not yet set.");
-    return -1;
-  }
   if (configuration.blecounter) {
     set_BLE_rssi_filter(configuration.ble_rssi_threshold);
     start_BLE_scan(configuration.blescantime, configuration.blescanwindow,
