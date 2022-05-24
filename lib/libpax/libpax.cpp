@@ -77,7 +77,6 @@ IRAM_ATTR int mac_add(uint8_t *paddr) {
   // Count only if MAC was not yet seen
   if (added) {
     macs_ble++;
-    // if it is NOT a locally administered ("random") mac, we don't count it
     ESP_LOGI(TAG, "MAC=%02x:%02x:%02x:%02x:%02x:%02x -> ID=%04x", paddr[0],
              paddr[1], paddr[2], paddr[3], paddr[4], paddr[5], *id);
     // added
