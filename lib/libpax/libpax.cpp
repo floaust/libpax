@@ -78,13 +78,9 @@ IRAM_ATTR int mac_add(uint8_t *paddr) {
   if (added) {
     macs_ble++;
     // if it is NOT a locally administered ("random") mac, we don't count it
-    if (!(paddr[0] & 0b10)) {
-      ESP_LOGI(TAG, "MAC=%02x:%02x:%02x:%02x:%02x:%02x -> ID=%04x; random",
-               paddr[0], paddr[1], paddr[2], paddr[3], paddr[4], paddr[5], *id);
-    } else {
-      ESP_LOGI(TAG, "MAC=%02x:%02x:%02x:%02x:%02x:%02x -> ID=%04x", paddr[0],
-               paddr[1], paddr[2], paddr[3], paddr[4], paddr[5], *id);
-    };  // added
+    ESP_LOGI(TAG, "MAC=%02x:%02x:%02x:%02x:%02x:%02x -> ID=%04x", paddr[0],
+             paddr[1], paddr[2], paddr[3], paddr[4], paddr[5], *id);
+    // added
   }
 
   return added;  // function returns bool if a new and unique BLE mac

@@ -45,12 +45,8 @@ void libpax_counter_reset() {
 }
 
 void report(TimerHandle_t xTimer) {
-  fill_counter(pCurrent_count);
-  report_callback();
-  // clear counter if not in cumulative counter mode
-  if (counter_mode != 1) {
-    libpax_counter_reset();
-  }
+  ESP_LOGI(TAG, "BLE device count: %d", libpax_ble_counter_count());
+  libpax_counter_reset();
 }
 
 TimerHandle_t PaxReportTimer = NULL;
@@ -107,9 +103,8 @@ int libpax_counter_count(struct count_payload_t* count) {
 }
 
 void disable_wifi() {
-  ESP_ERROR_CHECK(
-      esp_wifi_set_promiscuous(false));  // now switch off monitor mode
-  ESP_ERROR_CHECK(esp_wifi_stop());
-  ESP_ERROR_CHECK(esp_wifi_deinit());
+  esp_wifi_set_promiscuous(false);  // now switch off monitor mode
+  esp_wifi_stop();
+  esp_wifi_deinit();
   esp_wifi_set_mode(WIFI_MODE_NULL);
 }
