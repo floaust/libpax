@@ -33,6 +33,8 @@ limitations under the License.
 void (*report_callback)(void);
 struct count_payload_t* pCurrent_count;
 int counter_mode;
+int count_amount_max;
+int count_amount;
 
 void fill_counter(struct count_payload_t* pCount) {
   pCount->ble_count = libpax_ble_counter_count();
@@ -42,6 +44,18 @@ void libpax_counter_reset() {
   macs_ble = 0;
   ESP_LOGI(TAG, "reset");
   reset_bucket();
+
+  if (count_amount_max != 0)
+  {
+    count_amount += 1;
+    ESP_LOGI(TAG, "BLE scan count: %d", count_amount);
+    if (count_amount_max == count_amount)
+    {
+      libpax_counter_stop();
+    }
+    
+  }
+  
 }
 
 void report(TimerHandle_t xTimer) {
@@ -86,6 +100,7 @@ int libpax_counter_start(libpax_config_t configuration) {
     set_BLE_rssi_filter(configuration.ble_rssi_threshold);
     start_BLE_scan(configuration.blescantime, configuration.blescanwindow,
                    configuration.blescaninterval);
+    count_amount_max = configuration.ble_scan_count;
   }
   return 0;
 }
@@ -94,6 +109,7 @@ int libpax_counter_stop() {
   stop_BLE_scan();
   xTimerStop(PaxReportTimer, 0);
   PaxReportTimer = NULL;
+  ESP_LOGI(TAG, "stopped!");
   return 0;
 }
 

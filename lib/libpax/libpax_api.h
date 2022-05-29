@@ -14,7 +14,8 @@ struct libpax_config_t {
     uint8_t blecounter;                     // set to 0 if you do not want to install the BLE sniffer
     uint32_t blescantime;                   // [seconds] scan duration, 0 means infinite [default]
     uint16_t blescanwindow;                 // [milliseconds] scan window, see below, 3 ... 10240, default 80ms
-    uint16_t blescaninterval;               // [illiseconds] scan interval, see below, 3 ... 10240, default 80ms = 100% duty cycle
+    uint16_t blescaninterval;               // [milliseconds] scan interval, see below, 3 ... 10240, default 80ms = 100% duty cycle
+    int ble_scan_count;                     // number of scans to be done, 0 means infinite [default]
 };
 
 
