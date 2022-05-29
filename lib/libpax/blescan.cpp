@@ -197,7 +197,7 @@ void hci_evt_process(void *pvParameters) {
   }
 }
 
-void start_BLE_scan(uint16_t blescantime, uint16_t blescanwindow,
+void start_BLE_scan(uint16_t blescanwindow,
                     uint16_t blescaninterval) {
 #ifdef LIBPAX_BLE
   ESP_LOGI(TAG, "Initializing bluetooth scanner ...");

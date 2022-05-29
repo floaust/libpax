@@ -98,7 +98,7 @@ int libpax_counter_init(void (*init_callback)(void),
 int libpax_counter_start(libpax_config_t configuration) {
   if (configuration.blecounter) {
     set_BLE_rssi_filter(configuration.ble_rssi_threshold);
-    start_BLE_scan(configuration.blescantime, configuration.blescanwindow,
+    start_BLE_scan(configuration.blescanwindow,
                    configuration.blescaninterval);
     count_amount_max = configuration.ble_scan_count;
   }
