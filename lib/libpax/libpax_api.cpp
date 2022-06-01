@@ -65,8 +65,7 @@ void report(TimerHandle_t xTimer) {
 }
 
 TimerHandle_t PaxReportTimer = NULL;
-int libpax_counter_init(void (*init_callback)(void),
-                        struct count_payload_t* init_current_count,
+int libpax_counter_init(struct count_payload_t* init_current_count,
                         uint16_t init_pax_report_interval_sec,
                         int init_counter_mode) {
   if (PaxReportTimer != NULL && xTimerIsTimerActive(PaxReportTimer)) {
