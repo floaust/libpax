@@ -35,6 +35,7 @@ int counter_mode;
 int count_amount_max;
 int count_amount;
 int highest_count_amount;
+void (*ble_callback)(void);
 
 void fill_counter(struct count_payload_t* pCount) {
   pCount->ble_count = libpax_ble_counter_count();
@@ -55,6 +56,7 @@ void libpax_counter_reset() {
     if (count_amount_max == count_amount) {
       ESP_LOGI(TAG, "Highest BLE scan count: %d", highest_count_amount);
       libpax_counter_stop();
+      ble_callback();
     }
   }
 }
@@ -99,6 +101,7 @@ int libpax_counter_start(libpax_config_t configuration) {
     set_BLE_rssi_filter(configuration.ble_rssi_threshold);
     start_BLE_scan(configuration.blescanwindow, configuration.blescaninterval);
     count_amount_max = configuration.ble_scan_count;
+    ble_callback = configuration.ble_callback;
   }
   return 0;
 }
