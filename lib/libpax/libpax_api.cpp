@@ -38,7 +38,11 @@ int highest_count_amount;
 void (*ble_callback)(void);
 
 void fill_counter(struct count_payload_t* pCount) {
-  pCount->ble_count = libpax_ble_counter_count();
+  pCount->ble_count = highest_count_amount;
+}
+
+void fill_counter() {
+  pCurrent_count->ble_count = highest_count_amount;
 }
 
 void libpax_counter_reset() {
@@ -55,6 +59,7 @@ void libpax_counter_reset() {
     ESP_LOGI(TAG, "BLE scan count: %d", count_amount);
     if (count_amount_max == count_amount) {
       ESP_LOGI(TAG, "Highest BLE scan count: %d", highest_count_amount);
+      fill_counter();
       libpax_counter_stop();
       ble_callback();
     }
