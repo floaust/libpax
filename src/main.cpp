@@ -24,20 +24,3 @@ void init() {
   libpax_counter_init(process_count, &count_from_libpax, 10, 1); 
   libpax_counter_start(configuration);
 }
-
-#ifdef LIBPAX_ARDUINO
-// arduino code
-void setup() {
-  init();
-}
-
-void loop() {}
-#endif
-
-#ifdef LIBPAX_ESPIDF
-// espidf code
-extern "C" void app_main();
-void app_main() {
-  init();
-}
-#endif

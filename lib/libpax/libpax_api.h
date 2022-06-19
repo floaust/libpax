@@ -18,7 +18,7 @@ struct libpax_config_t {
   void (*ble_callback)(void);   // callback function for executing after stopping BLE counter
 };
 
-// payload updated periodically or on demand
+// payload updated on demand
 struct count_payload_t {
   uint32_t ble_count;  // detected ble_count in interval
 };

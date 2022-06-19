@@ -60,13 +60,16 @@ IRAM_ATTR int add_to_bucket(uint16_t id) {
   }
 }
 
+// resets the counter
 void reset_bucket() {
   memset(seen_ids_map, 0, sizeof(seen_ids_map));
   seen_ids_count = 0;
 }
 
+// returns the number of unique mac addresses seen
 int libpax_ble_counter_count() { return macs_ble; }
 
+// adds the given mac address to the counter if it is new
 IRAM_ATTR int mac_add(uint8_t *paddr) {
   uint16_t *id;
   // mac addresses are 6 bytes long, we only use the last two bytes
