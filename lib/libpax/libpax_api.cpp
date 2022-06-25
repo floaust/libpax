@@ -68,10 +68,11 @@ void libpax_counter_reset() {
     // hands over the current counted mac addresses to the payload struct given in the initialisation 
     // stops the counter
     // callback function gets called 
-    if (count_amount_max == count_amount) {
+    if (count_amount_max >= count_amount) {
       ESP_LOGI(TAG, "Highest BLE scan count: %d", highest_count_amount);
       fill_counter();
       libpax_counter_stop();
+      count_amount = 0;
       ble_callback();
     }
   }
