@@ -6,13 +6,16 @@
     "repository":
     {
       "type": "git",
-      "url": "https://github.com/dbSuS/libpax"
+      "url": "https://github.com/floaust/libpax"
     },
     "authors":
     [
       {
         "name":"Grey Rook GmbH",
         "email":"info@greyrook.com"
+      },
+      {
+        "name":"Florian Aust"
       }
     ],
     "frameworks": ["espidf", "arduino"],
