@@ -9,7 +9,7 @@
 #endif
 
 #ifndef BLESCANINTERVAL
-#define BLESCANINTERVAL 80  // [illiseconds]
+#define BLESCANINTERVAL 80  // [milliseconds]
 #endif
 
 // local Tag for logging

@@ -37,26 +37,37 @@ int count_amount;
 int highest_count_amount;
 void (*ble_callback)(void);
 
+// hands over the max counted mac addresses to the given payload pCount struct 
 void fill_counter(struct count_payload_t* pCount) {
   pCount->ble_count = highest_count_amount;
 }
 
+// hands over the current counted mac addresses to the payload struct given in the initialisation
 void fill_counter() {
   pCurrent_count->ble_count = highest_count_amount;
 }
 
+// resets the counter
 void libpax_counter_reset() {
+  // writes the highest count amount to highest_count_amount
   if (highest_count_amount < macs_ble) {
     highest_count_amount = macs_ble;
   }
 
+  // resets the counter to 0
   macs_ble = 0;
   ESP_LOGI(TAG, "reset");
   reset_bucket();
 
+  // count the scan cycles
   if (count_amount_max != 0) {
     count_amount += 1;
     ESP_LOGI(TAG, "BLE scan count: %d", count_amount);
+
+    // if the max count amount is reached, 
+    // hands over the current counted mac addresses to the payload struct given in the initialisation 
+    // stops the counter
+    // callback function gets called 
     if (count_amount_max == count_amount) {
       ESP_LOGI(TAG, "Highest BLE scan count: %d", highest_count_amount);
       fill_counter();
@@ -66,6 +77,7 @@ void libpax_counter_reset() {
   }
 }
 
+// reports the bluetooth mac count and calls libpax_counter_reset
 void report(TimerHandle_t xTimer) {
   ESP_LOGI(TAG, "BLE device count: %d", libpax_ble_counter_count());
   libpax_counter_reset();
@@ -101,6 +113,7 @@ int libpax_counter_init(struct count_payload_t* init_current_count,
   return 0;
 }
 
+// starts the counter
 int libpax_counter_start(libpax_config_t configuration) {
   if (configuration.blecounter) {
     set_BLE_rssi_filter(configuration.ble_rssi_threshold);
@@ -111,6 +124,7 @@ int libpax_counter_start(libpax_config_t configuration) {
   return 0;
 }
 
+// stops the counter
 int libpax_counter_stop() {
   stop_BLE_scan();
   xTimerStop(PaxReportTimer, 0);
@@ -124,6 +138,7 @@ int libpax_counter_count(struct count_payload_t* count) {
   return 0;
 }
 
+// disables wifi
 void disable_wifi() {
   esp_wifi_set_promiscuous(false);  // now switch off monitor mode
   esp_wifi_stop();
